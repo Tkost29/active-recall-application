@@ -1,0 +1,26 @@
+{
+  "name": "learning-application",
+  "version": "1.0.0",
+  "description": "AI学習アプリケーション - ChatGPT APIを使用した用語学習・問題出題・採点システム",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "education",
+    "ai",
+    "chatgpt",
+    "learning"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

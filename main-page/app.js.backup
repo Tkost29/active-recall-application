@@ -1,0 +1,198 @@
+// グローバル変数
+let terms = [];
+let currentQuestion = '';
+let currentAnswer = '';
+
+// 用語を追加
+function addTerm() {
+  const termName = document.getElementById('termName').value.trim();
+  const termDescription = document.getElementById('termDescription').value.trim();
+  
+  if (!termName || !termDescription) {
+    alert('用語名と説明を両方入力してください。');
+    return;
+  }
+  
+  terms.push({
+    name: termName,
+    description: termDescription
+  });
+  
+  // 入力フィールドをクリア
+  document.getElementById('termName').value = '';
+  document.getElementById('termDescription').value = '';
+  
+  // リストを更新
+  displayTerms();
+  
+  // 次へボタンを有効化
+  document.getElementById('nextBtn').disabled = false;
+}
+
+// 用語リストを表示
+function displayTerms() {
+  const termsList = document.getElementById('termsList');
+  termsList.innerHTML = '';
+  
+  if (terms.length === 0) {
+    termsList.innerHTML = '<p style="color: #999; text-align: center;">まだ用語が登録されていません</p>';
+    return;
+  }
+  
+  terms.forEach((term, index) => {
+    const termCard = document.createElement('div');
+    termCard.className = 'term-card';
+    termCard.innerHTML = `
+      <h4>${term.name}</h4>
+      <p>${term.description}</p>
+      <button onclick="deleteTerm(${index})" class="btn btn-danger">削除</button>
+    `;
+    termsList.appendChild(termCard);
+  });
+}
+
+// 用語を削除
+function deleteTerm(index) {
+  if (confirm('この用語を削除してもよろしいですか?')) {
+    terms.splice(index, 1);
+    displayTerms();
+    
+    if (terms.length === 0) {
+      document.getElementById('nextBtn').disabled = true;
+    }
+  }
+}
+
+// ステップ2へ移動
+async function goToStep2() {
+  if (terms.length === 0) {
+    alert('まず用語を登録してください。');
+    return;
+  }
+  
+  showStep('step2');
+  await generateQuestion();
+}
+
+// ステップ1へ移動
+function goToStep1() {
+  showStep('step1');
+}
+
+// ステップ表示切り替え
+function showStep(stepId) {
+  document.querySelectorAll('.step').forEach(step => {
+    step.classList.remove('active');
+  });
+  document.getElementById(stepId).classList.add('active');
+}
+
+// 問題を生成
+async function generateQuestion() {
+  const generatingMessage = document.getElementById('generatingMessage');
+  const questionDisplay = document.getElementById('questionDisplay');
+  
+  generatingMessage.style.display = 'block';
+  questionDisplay.style.display = 'none';
+  
+  try {
+    // 用語リストを整形
+    const termsContext = terms.map(t => `用語: ${t.name}\n説明: ${t.description}`).join('\n\n');
+    
+    const response = await fetch('http://localhost:3000/api/generate-question', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ terms: termsContext })
+    });
+    
+    if (!response.ok) {
+      throw new Error('問題の生成に失敗しました');
+    }
+    
+    const data = await response.json();
+    currentQuestion = data.question;
+    
+    // 問題を表示
+    document.getElementById('questionText').textContent = currentQuestion;
+    generatingMessage.style.display = 'none';
+    questionDisplay.style.display = 'block';
+    
+  } catch (error) {
+    console.error('Error:', error);
+    alert('問題の生成中にエラーが発生しました。サーバーが起動しているか確認してください。');
+    goToStep1();
+  }
+}
+
+// 回答を提出
+async function submitAnswer() {
+  const userAnswer = document.getElementById('userAnswer').value.trim();
+  
+  if (!userAnswer) {
+    alert('回答を入力してください。');
+    return;
+  }
+  
+  showStep('step3');
+  await gradeAnswer(userAnswer);
+}
+
+// 回答を採点
+async function gradeAnswer(userAnswer) {
+  const gradingMessage = document.getElementById('gradingMessage');
+  const resultDisplay = document.getElementById('resultDisplay');
+  
+  gradingMessage.style.display = 'block';
+  resultDisplay.style.display = 'none';
+  
+  try {
+    // 用語リストを整形
+    const termsContext = terms.map(t => `用語: ${t.name}\n説明: ${t.description}`).join('\n\n');
+    
+    const response = await fetch('http://localhost:3000/api/grade-answer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        terms: termsContext,
+        question: currentQuestion,
+        userAnswer: userAnswer
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('採点に失敗しました');
+    }
+    
+    const data = await response.json();
+    
+    // 結果を表示
+    document.getElementById('scoreValue').textContent = data.score;
+    document.getElementById('feedbackText').textContent = data.feedback;
+    document.getElementById('userAnswerDisplay').textContent = userAnswer;
+    document.getElementById('modelAnswerDisplay').textContent = data.modelAnswer;
+    
+    gradingMessage.style.display = 'none';
+    resultDisplay.style.display = 'block';
+    
+  } catch (error) {
+    console.error('Error:', error);
+    alert('採点中にエラーが発生しました。サーバーが起動しているか確認してください。');
+    goToStep2();
+  }
+}
+
+// 新しい問題を生成
+async function generateNewQuestion() {
+  document.getElementById('userAnswer').value = '';
+  showStep('step2');
+  await generateQuestion();
+}
+
+// 初期化
+document.addEventListener('DOMContentLoaded', () => {
+  displayTerms();
+});

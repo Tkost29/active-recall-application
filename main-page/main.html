@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>active recall learning</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>active recall learning </h1>
+    </header>
+    <main class="main-content">
+      <section id="section-register" class="content-section active">
+        <h2>📝 用語登録</h2>
+        <div class="card">
+          <div class="input-group">
+            <label for="termName">用語名:</label>
+            <input type="text" id="termName" placeholder="例: 機械学習">
+          </div>
+          <div class="input-group">
+            <label for="termDescription">説明:</label>
+            <textarea id="termDescription" rows="4" placeholder="用語の説明を入力してください"></textarea>
+          </div>
+          <button onclick="addTerm()" class="btn btn-primary">用語を追加</button>
+        </div>
+        <div class="terms-list">
+          <h3>登録済み用語</h3>
+          <div id="termsList"></div>
+        </div>
+      </section>
+      <section id="section-quiz" class="content-section">
+        <h2>✏️ 問題を解く</h2>
+        <div id="noTermsMessage" class="message-box">
+          <p>まず用語を登録してください。</p>
+          <button onclick="navigateTo(`register`)" class="btn btn-secondary">用語登録へ</button>
+        </div>
+        <div id="quizContent" style="display: none;">
+          <div id="quizStart" class="card">
+            <h3>モードを選択</h3>
+            <div class="quiz-mode-selection">
+              <div class="mode-card practice-mode" onclick="startQuiz('practice')">
+                <div class="mode-icon">📝</div>
+                <h4>練習モード</h4>
+                <p>すべての用語から出題。レベルに影響しません。気軽に練習できます。</p>
+                <button class="btn btn-secondary">練習を開始</button>
+              </div>
+              <div class="mode-card levelup-mode" onclick="startQuiz('levelup')">
+                <div class="mode-icon">🎯</div>
+                <h4>レベルアップモード</h4>
+                <p>復習時期が来た用語から出題。正解でレベルアップ、<strong>不正解でレベルリセット</strong></p>
+                <div id="reviewableCount" class="review-count"></div>
+                <button class="btn btn-primary">レベルアップに挑戦</button>
+              </div>
+            </div>
+          </div>
+          <div id="quizGenerating" class="card" style="display: none;">
+            <div class="loading"><div class="spinner"></div><p>AIが問題を生成中...</p></div>
+          </div>
+          <div id="quizQuestion" class="card" style="display: none;">
+            <div class="question-box"><h3>問題:</h3><p id="questionText"></p></div>
+            <div class="input-group">
+              <label for="userAnswer">あなたの回答:</label>
+              <textarea id="userAnswer" rows="6" placeholder="ここに回答を入力してください..."></textarea>
+            </div>
+            <button onclick="submitAnswer()" class="btn btn-primary">回答を提出</button>
+          </div>
+          <div id="quizGrading" class="card" style="display: none;">
+            <div class="loading"><div class="spinner"></div><p>AIが採点中...</p></div>
+          </div>
+          <div id="quizResult" class="card" style="display: none;">
+            <div class="score-display"><h3>スコア</h3><div class="score-circle"><span id="scoreValue">0</span>点</div></div>
+            <div class="feedback-box"><h3>📋 フィードバック</h3><p id="feedbackText"></p></div>
+            <div class="answer-comparison">
+              <div class="answer-box"><h4>あなたの回答:</h4><p id="userAnswerDisplay"></p></div>
+              <div class="answer-box model-answer"><h4>模範解答:</h4><p id="modelAnswerDisplay"></p></div>
+            </div>
+            <div class="button-group">
+              <button onclick="startQuiz()" class="btn btn-primary">次の問題</button>
+              <button onclick="navigateTo(`history`)" class="btn btn-secondary">学習記録を見る</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="section-history" class="content-section">
+        <h2>📊 学習記録</h2>
+        <div class="stats-container">
+          <div class="stat-card"><div class="stat-number" id="totalQuestions">0</div><div class="stat-label">解いた問題数</div></div>
+          <div class="stat-card"><div class="stat-number" id="averageScore">0</div><div class="stat-label">平均スコア</div></div>
+          <div class="stat-card"><div class="stat-number" id="totalTerms">0</div><div class="stat-label">登録用語数</div></div>
+        </div>
+        <div class="history-list">
+          <h3>最近の学習履歴</h3>
+          <div id="historyList"><p class="no-data">まだ学習履歴がありません</p></div>
+        </div>
+        <button onclick="clearHistory()" class="btn btn-danger">履歴をクリア</button>
+      </section>
+      <section id="section-dictionary" class="content-section">
+        <h2>📖 用語集</h2>
+        <div class="search-box"><input type="text" id="searchTerm" placeholder="用語を検索..." oninput="searchTerms()"></div>
+        <div id="dictionaryList" class="dictionary-list"></div>
+        <div id="noDictionaryData" class="message-box">
+          <p>まだ用語が登録されていません。</p>
+          <button onclick="navigateTo(`register`)" class="btn btn-secondary">用語を登録</button>
+        </div>
+      </section>
+    </main>
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="navigateTo(`register`)" data-section="register"><span class="nav-icon">📝</span><span class="nav-label">用語登録</span></button>
+      <button class="nav-item" onclick="navigateTo(`quiz`)" data-section="quiz"><span class="nav-icon">✏️</span><span class="nav-label">問題を解く</span></button>
+      <button class="nav-item" onclick="navigateTo(`history`)" data-section="history"><span class="nav-icon">📊</span><span class="nav-label">学習記録</span></button>
+      <button class="nav-item" onclick="navigateTo(`dictionary`)" data-section="dictionary"><span class="nav-icon">📖</span><span class="nav-label">用語集</span></button>
+    </nav>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
