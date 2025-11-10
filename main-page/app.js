@@ -32,10 +32,33 @@ function loadData() {
       correctCount: term.correctCount || 0,
       totalAttempts: term.totalAttempts || 0
     }));
+    
+    // maxHoursを過ぎた用語のレベルをリセット
+    checkAndResetExpiredTerms();
   }
   
   if (savedHistory) {
     learningHistory = JSON.parse(savedHistory);
+  }
+}
+
+// maxHoursを過ぎた用語のレベルを自動リセット
+function checkAndResetExpiredTerms() {
+  let resetCount = 0;
+  
+  terms.forEach(term => {
+    if (needsLevelReset(term)) {
+      console.log(`⚠️ レベルリセット: ${term.name} (Lv${term.level} → Lv1) - maxHours超過`);
+      term.level = 1; // Lv1にリセット
+      term.nextReviewDate = null;
+      term.lastReviewDate = new Date().toISOString();
+      resetCount++;
+    }
+  });
+  
+  if (resetCount > 0) {
+    saveData();
+    console.log(`📉 ${resetCount}件の用語レベルをリセットしました`);
   }
 }
 
@@ -89,6 +112,20 @@ function calculateNextReviewDate(currentLevel) {
   const nextDate = new Date(now.getTime() + hoursUntilNextReview * 60 * 60 * 1000);
   
   return nextDate.toISOString();
+}
+
+// maxHoursを過ぎてレベルリセットが必要かチェック
+function needsLevelReset(term) {
+  if (term.level === 0 || term.level >= 7) return false; // Lv0と完璧Lv7はリセット不要
+  if (!term.lastReviewDate) return false;
+  
+  const config = LEVEL_CONFIG[term.level];
+  const now = new Date();
+  const lastReview = new Date(term.lastReviewDate);
+  const hoursPassed = (now - lastReview) / (1000 * 60 * 60);
+  
+  // maxHoursを過ぎている場合
+  return hoursPassed > config.maxHours;
 }
 
 function isReadyForReview(term) {
@@ -170,6 +207,9 @@ function addTerm() {
 }
 
 function displayTerms() {
+  // 表示前にレベルリセットをチェック
+  checkAndResetExpiredTerms();
+  
   const termsList = document.getElementById('termsList');
   termsList.innerHTML = '';
   
@@ -197,7 +237,7 @@ function displayTerms() {
       </div>
       <p>${term.description}</p>
       <div class="term-stats">
-        <span>📅 ${getNextReviewText(term)}</span>
+        <span> ${getNextReviewText(term)}</span>
         <span>✅ ${term.correctCount}/${term.totalAttempts}回正解</span>
       </div>
       <button onclick="deleteTerm(${index})" class="btn btn-danger">削除</button>
@@ -250,7 +290,14 @@ function initQuizSection() {
 }
 
 async function startQuiz(mode) {
+  // modeが指定されていない場合は前回のモードを使用
+  if (!mode) {
+    mode = currentQuizMode || 'practice';
+  }
   currentQuizMode = mode;
+  
+  // 問題開始前にレベルリセットをチェック
+  checkAndResetExpiredTerms();
   
   let selectedTerms;
   
@@ -289,7 +336,8 @@ async function startQuiz(mode) {
   document.getElementById('quizResult').style.display = 'none';
   
   try {
-    const termsContext = `用語: ${randomTerm.name}\n説明: ${randomTerm.description}`;
+    // 問題生成時は用語名のみを送る（説明は送らない）
+    const termsContext = `用語: ${randomTerm.name}`;
     
     const response = await fetch('http://localhost:3000/api/generate-question', {
       method: 'POST',
@@ -382,7 +430,7 @@ async function submitAnswer() {
     if (currentQuizMode === 'practice') {
       // 練習モード: レベルに影響しない
       levelUpMessage = `<div class="practice-info">
-        📝 練習モードのため、レベルには影響しません
+         練習モードのため、レベルには影響しません
       </div>`;
       levelChangeText = `練習 (Lv${oldLevel}維持)`;
       
@@ -498,7 +546,7 @@ function displayHistory() {
         <div class="history-item-date">${dateStr}</div>
         <div class="history-item-score">${item.score}点</div>
       </div>
-      ${item.termName ? `<div class="history-item-term">📚 ${item.termName} ${item.mode ? `[${item.mode}]` : ''} ${item.levelChange ? `(${item.levelChange})` : ''}</div>` : ''}
+      ${item.termName ? `<div class="history-item-term"> ${item.termName} ${item.mode ? `[${item.mode}]` : ''} ${item.levelChange ? `(${item.levelChange})` : ''}</div>` : ''}
       <div class="history-item-question">${item.question.substring(0, 100)}${item.question.length > 100 ? '...' : ''}</div>
     `;
     historyList.appendChild(historyItem);
@@ -546,7 +594,7 @@ function displayDictionary() {
       </div>
       <p>${term.description}</p>
       <div class="term-stats">
-        <span>📅 ${getNextReviewText(term)}</span>
+        <span> ${getNextReviewText(term)}</span>
       </div>
     `;
     dictionaryList.appendChild(dictItem);
@@ -586,7 +634,7 @@ function searchTerms() {
       </div>
       <p>${term.description}</p>
       <div class="term-stats">
-        <span>📅 ${getNextReviewText(term)}</span>
+        <span> ${getNextReviewText(term)}</span>
       </div>
     `;
     dictionaryList.appendChild(dictItem);

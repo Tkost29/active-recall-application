@@ -13,7 +13,7 @@
     </header>
     <main class="main-content">
       <section id="section-register" class="content-section active">
-        <h2>📝 用語登録</h2>
+        <h2> 用語登録</h2>
         <div class="card">
           <div class="input-group">
             <label for="termName">用語名:</label>
@@ -31,7 +31,7 @@
         </div>
       </section>
       <section id="section-quiz" class="content-section">
-        <h2>✏️ 問題を解く</h2>
+        <h2> 問題を解く</h2>
         <div id="noTermsMessage" class="message-box">
           <p>まず用語を登録してください。</p>
           <button onclick="navigateTo(`register`)" class="btn btn-secondary">用語登録へ</button>
@@ -71,7 +71,7 @@
           </div>
           <div id="quizResult" class="card" style="display: none;">
             <div class="score-display"><h3>スコア</h3><div class="score-circle"><span id="scoreValue">0</span>点</div></div>
-            <div class="feedback-box"><h3>📋 フィードバック</h3><p id="feedbackText"></p></div>
+            <div class="feedback-box"><h3> フィードバック</h3><p id="feedbackText"></p></div>
             <div class="answer-comparison">
               <div class="answer-box"><h4>あなたの回答:</h4><p id="userAnswerDisplay"></p></div>
               <div class="answer-box model-answer"><h4>模範解答:</h4><p id="modelAnswerDisplay"></p></div>
@@ -84,7 +84,7 @@
         </div>
       </section>
       <section id="section-history" class="content-section">
-        <h2>📊 学習記録</h2>
+        <h2> 学習記録</h2>
         <div class="stats-container">
           <div class="stat-card"><div class="stat-number" id="totalQuestions">0</div><div class="stat-label">解いた問題数</div></div>
           <div class="stat-card"><div class="stat-number" id="averageScore">0</div><div class="stat-label">平均スコア</div></div>
@@ -97,7 +97,7 @@
         <button onclick="clearHistory()" class="btn btn-danger">履歴をクリア</button>
       </section>
       <section id="section-dictionary" class="content-section">
-        <h2>📖 用語集</h2>
+        <h2> 用語集</h2>
         <div class="search-box"><input type="text" id="searchTerm" placeholder="用語を検索..." oninput="searchTerms()"></div>
         <div id="dictionaryList" class="dictionary-list"></div>
         <div id="noDictionaryData" class="message-box">
@@ -111,6 +111,12 @@
       <button class="nav-item" onclick="navigateTo(`quiz`)" data-section="quiz"><span class="nav-icon">✏️</span><span class="nav-label">問題を解く</span></button>
       <button class="nav-item" onclick="navigateTo(`history`)" data-section="history"><span class="nav-icon">📊</span><span class="nav-label">学習記録</span></button>
       <button class="nav-item" onclick="navigateTo(`dictionary`)" data-section="dictionary"><span class="nav-icon">📖</span><span class="nav-label">用語集</span></button>
+    </nav>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
+class="nav-label">用語集</span></button>
     </nav>
   </div>
   <script src="app.js"></script>
