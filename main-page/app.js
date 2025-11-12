@@ -30,7 +30,8 @@ function loadData() {
       nextReviewDate: term.nextReviewDate || null,
       lastReviewDate: term.lastReviewDate || null,
       correctCount: term.correctCount || 0,
-      totalAttempts: term.totalAttempts || 0
+      totalAttempts: term.totalAttempts || 0,
+      createdAt: term.createdAt || term.addedDate || new Date().toISOString() // createdAtがない場合はaddedDateを使用
     }));
     
     // maxHoursを過ぎた用語のレベルをリセット
@@ -187,6 +188,7 @@ function addTerm() {
     name: termName,
     description: termDescription,
     addedDate: new Date().toISOString(),
+    createdAt: new Date().toISOString(), // 登録日時を追加
     level: 0,
     nextReviewDate: null,
     lastReviewDate: null,
@@ -516,14 +518,29 @@ async function submitAnswer() {
 // === 学習記録機能 ===
 function displayHistory() {
   // 統計情報の更新
-  const totalQuestions = learningHistory.length;
-  const averageScore = totalQuestions > 0 
-    ? Math.round(learningHistory.reduce((sum, h) => sum + h.score, 0) / totalQuestions)
-    : 0;
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  
+  // 今日登録された用語数
+  const todayTerms = terms.filter(term => {
+    if (!term.createdAt) return false;
+    const createdDate = new Date(term.createdAt);
+    const createdDay = new Date(createdDate.getFullYear(), createdDate.getMonth(), createdDate.getDate());
+    return createdDay.getTime() === today.getTime();
+  }).length;
+  
+  // 今月登録された用語数
+  const monthTerms = terms.filter(term => {
+    if (!term.createdAt) return false;
+    const createdDate = new Date(term.createdAt);
+    return createdDate >= monthStart;
+  }).length;
+  
   const totalTerms = terms.length;
   
-  document.getElementById('totalQuestions').textContent = totalQuestions;
-  document.getElementById('averageScore').textContent = averageScore;
+  document.getElementById('todayTerms').textContent = todayTerms;
+  document.getElementById('monthTerms').textContent = monthTerms;
   document.getElementById('totalTerms').textContent = totalTerms;
   
   // 履歴リストの表示
