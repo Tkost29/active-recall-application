@@ -751,3 +751,32 @@ textarea:focus {
     font-size: 20px;
   }
 }
+
+/* レベル別棒グラフ（Chart.js用） */
+.level-chart-container {
+  margin: 30px 0;
+  padding: 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.level-chart-container h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.2em;
+}
+
+.chart-wrapper {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  position: relative;
+  height: 400px;
+}
+
+#levelChart {
+  max-height: 100%;
+}
+

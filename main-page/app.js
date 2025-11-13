@@ -515,6 +515,184 @@ async function submitAnswer() {
   }
 }
 
+// Chart.jsのインスタンスを保持する変数
+let levelChartInstance = null;
+
+// レベル別棒グラフを表示（Chart.js使用）
+function displayLevelChart() {
+  const ctx = document.getElementById('levelChart');
+  
+  // 既存のチャートインスタンスがあれば破棄
+  if (levelChartInstance) {
+    levelChartInstance.destroy();
+  }
+  
+  // レベル0～7の用語数をカウント
+  const levelCounts = Array(8).fill(0);
+  terms.forEach(term => {
+    const level = term.level || 0;
+    if (level >= 0 && level <= 7) {
+      levelCounts[level]++;
+    }
+  });
+  
+  // ラベルと色の設定
+  const labels = ['未学習', 'Lv1', 'Lv2', 'Lv3', 'Lv4', 'Lv5', 'Lv6', 'Lv7'];
+  const backgroundColors = [
+    '#999',  // 未学習
+    '#ff6b6b',  // Lv1
+    '#ff8c42',  // Lv2
+    '#ffd93d',  // Lv3
+    '#6bcf7f',  // Lv4
+    '#4d96ff',  // Lv5
+    '#9d4edd',  // Lv6
+    '#ff006e'   // Lv7
+  ];
+  
+  // 最大値を計算してY軸の上限を設定（余裕を持たせる）
+  const maxCount = Math.max(...levelCounts, 1);
+  const suggestedMax = Math.ceil(maxCount * 1.2); // 最大値の1.2倍で余裕を持たせる
+  
+  // Chart.jsでグラフを作成
+  levelChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: '用語数',
+        data: levelCounts,
+        backgroundColor: backgroundColors,
+        borderColor: backgroundColors.map(color => color),
+        borderWidth: 2,
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `用語数: ${context.parsed.y}件`;
+            }
+          },
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          padding: 12,
+          borderColor: '#666',
+          borderWidth: 1
+        },
+        // 棒グラフの上に数値を表示するプラグイン
+        datalabels: {
+          display: false // datalabelsプラグインは使用しない（Chart.js標準機能で実装）
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          suggestedMax: suggestedMax, // Y軸の最大値に余裕を持たせる
+          ticks: {
+            stepSize: 1,
+            font: {
+              size: 12
+            },
+            color: '#666'
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)',
+            drawBorder: true,
+            borderColor: '#ccc',
+            borderWidth: 2
+          },
+          title: {
+            display: true,
+            text: '用語数（件）',
+            font: {
+              size: 14,
+              weight: 'bold'
+            },
+            color: '#333'
+          }
+        },
+        x: {
+          ticks: {
+            font: {
+              size: 11,
+              weight: '500'
+            },
+            color: '#555'
+          },
+          grid: {
+            display: false,
+            drawBorder: true,
+            borderColor: '#ccc',
+            borderWidth: 2
+          },
+          title: {
+            display: true,
+            text: 'レベル',
+            font: {
+              size: 14,
+              weight: 'bold'
+            },
+            color: '#333'
+          }
+        }
+      },
+      animation: {
+        duration: 800,
+        easing: 'easeInOutQuart'
+      },
+      // 棒グラフの上に数値を表示
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `用語数: ${context.parsed.y}件`;
+            }
+          },
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          padding: 12,
+          borderColor: '#666',
+          borderWidth: 1
+        }
+      }
+    },
+    plugins: [{
+      id: 'customDataLabels',
+      afterDatasetsDraw: function(chart) {
+        const ctx = chart.ctx;
+        chart.data.datasets.forEach((dataset, datasetIndex) => {
+          const meta = chart.getDatasetMeta(datasetIndex);
+          meta.data.forEach((bar, index) => {
+            const value = dataset.data[index];
+            if (value > 0) {
+              ctx.save();
+              ctx.font = 'bold 14px Arial';
+              ctx.fillStyle = '#333';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'bottom';
+              ctx.fillText(value, bar.x, bar.y - 5);
+              ctx.restore();
+            }
+          });
+        });
+      }
+    }]
+  });
+}
+
 // === 学習記録機能 ===
 function displayHistory() {
   // 統計情報の更新
@@ -542,6 +720,9 @@ function displayHistory() {
   document.getElementById('todayTerms').textContent = todayTerms;
   document.getElementById('monthTerms').textContent = monthTerms;
   document.getElementById('totalTerms').textContent = totalTerms;
+  
+  // レベル別棒グラフの表示
+  displayLevelChart();
   
   // 履歴リストの表示
   const historyList = document.getElementById('historyList');

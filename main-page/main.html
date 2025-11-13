@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>active recall learning</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -89,6 +90,12 @@
           <div class="stat-card"><div class="stat-number" id="todayTerms">0</div><div class="stat-label">今日の登録数</div></div>
           <div class="stat-card"><div class="stat-number" id="monthTerms">0</div><div class="stat-label">今月の登録数</div></div>
           <div class="stat-card"><div class="stat-number" id="totalTerms">0</div><div class="stat-label">総登録用語数</div></div>
+        </div>
+        <div class="level-chart-container">
+          <h3>レベル別用語数</h3>
+          <div class="chart-wrapper">
+            <canvas id="levelChart"></canvas>
+          </div>
         </div>
         <div class="history-list">
           <h3>最近の学習履歴</h3>
