@@ -413,6 +413,13 @@ textarea:focus {
   margin-bottom: 15px;
 }
 
+.quiz-level-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
 .quiz-term-name {
   font-size: 1.1em;
   font-weight: bold;

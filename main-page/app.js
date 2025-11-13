@@ -356,16 +356,15 @@ async function startQuiz(mode) {
     const data = await response.json();
     currentQuestion = data.question;
     
-    // 問題を表示
+    // 問題を表示（用語名は表示しない）
     const modeBadge = mode === 'practice' 
       ? '<span class="mode-badge practice">📝 練習モード</span>' 
       : '<span class="mode-badge levelup">🎯 レベルアップモード</span>';
     
     document.getElementById('questionText').innerHTML = `
       ${modeBadge}
-      <div class="quiz-term-info">
+      <div class="quiz-level-info">
         ${getLevelBadgeHTML(randomTerm.level)}
-        <span class="quiz-term-name">${randomTerm.name}</span>
       </div>
       <p>${currentQuestion}</p>
     `;
