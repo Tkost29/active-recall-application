@@ -15,6 +15,16 @@
     <main class="main-content">
       <section id="section-register" class="content-section active">
         <h2> 用語登録</h2>
+        <div class="register-stats-container">
+          <div class="register-stat-card">
+            <div class="register-stat-number" id="todayTasksCount">0</div>
+            <div class="register-stat-label">本日のタスク数</div>
+          </div>
+          <div class="register-stat-card">
+            <div class="register-stat-number" id="todayNewTasksCount">0</div>
+            <div class="register-stat-label">今日追加したタスク</div>
+          </div>
+        </div>
         <div class="card">
           <div class="input-group">
             <label for="termName">用語名:</label>
@@ -25,10 +35,6 @@
             <textarea id="termDescription" rows="4" placeholder="用語の説明を入力してください"></textarea>
           </div>
           <button onclick="addTerm()" class="btn btn-primary">用語を追加</button>
-        </div>
-        <div class="terms-list">
-          <h3>登録済み用語</h3>
-          <div id="termsList"></div>
         </div>
       </section>
       <section id="section-quiz" class="content-section">

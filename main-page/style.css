@@ -150,6 +150,41 @@ textarea:focus {
   background: #c82333;
 }
 
+/* 用語登録ページの統計表示 */
+.register-stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.register-stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.register-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+}
+
+.register-stat-number {
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 8px;
+}
+
+.register-stat-label {
+  font-size: 0.9em;
+  color: #666;
+  font-weight: 500;
+}
+
 .terms-list {
   margin-top: 30px;
 }

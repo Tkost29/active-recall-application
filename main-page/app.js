@@ -90,6 +90,7 @@ function navigateTo(section) {
   // セクション別の初期化処理
   if (section === 'register') {
     displayTerms();
+    updateRegisterStats();
   } else if (section === 'quiz') {
     initQuizSection();
   } else if (section === 'history') {
@@ -202,10 +203,31 @@ function addTerm() {
   document.getElementById('termName').value = '';
   document.getElementById('termDescription').value = '';
   
-  // リストを更新
+  // リストと統計情報を更新
   displayTerms();
+  updateRegisterStats();
   
   alert(`「${termName}」を追加しました！`);
+}
+
+// 用語登録ページの統計情報を更新
+function updateRegisterStats() {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  
+  // 本日のタスク数（復習可能な用語数）
+  const todayTasks = terms.filter(term => isReadyForReview(term)).length;
+  
+  // 今日追加したタスク数
+  const todayNewTasks = terms.filter(term => {
+    if (!term.createdAt) return false;
+    const createdDate = new Date(term.createdAt);
+    const createdDay = new Date(createdDate.getFullYear(), createdDate.getMonth(), createdDate.getDate());
+    return createdDay.getTime() === today.getTime();
+  }).length;
+  
+  document.getElementById('todayTasksCount').textContent = todayTasks;
+  document.getElementById('todayNewTasksCount').textContent = todayNewTasks;
 }
 
 function displayTerms() {
