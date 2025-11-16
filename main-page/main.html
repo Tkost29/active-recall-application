@@ -17,12 +17,16 @@
         <h2> 用語登録</h2>
         <div class="register-stats-container">
           <div class="register-stat-card">
-            <div class="register-stat-number" id="todayTasksCount">0</div>
-            <div class="register-stat-label">本日のタスク数</div>
+            <div class="register-stat-number" id="currentTasksCount">0</div>
+            <div class="register-stat-label">現在のタスク数</div>
           </div>
           <div class="register-stat-card">
             <div class="register-stat-number" id="todayNewTasksCount">0</div>
             <div class="register-stat-label">今日追加したタスク</div>
+          </div>
+          <div class="register-stat-card urgent">
+            <div class="register-stat-icon">⚠️</div>
+            <div class="register-stat-text" id="urgentDeadlineText">期限が迫っている用語はありません</div>
           </div>
         </div>
         <div class="card">

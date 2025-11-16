@@ -89,7 +89,6 @@ function navigateTo(section) {
   
   // セクション別の初期化処理
   if (section === 'register') {
-    displayTerms();
     updateRegisterStats();
   } else if (section === 'quiz') {
     initQuizSection();
@@ -212,11 +211,14 @@ function addTerm() {
 
 // 用語登録ページの統計情報を更新
 function updateRegisterStats() {
+  // まずレベルリセットをチェック
+  checkAndResetExpiredTerms();
+  
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   
-  // 本日のタスク数（復習可能な用語数）
-  const todayTasks = terms.filter(term => isReadyForReview(term)).length;
+  // 現在のタスク数（復習可能な用語数）
+  const currentTasks = terms.filter(term => isReadyForReview(term)).length;
   
   // 今日追加したタスク数
   const todayNewTasks = terms.filter(term => {
@@ -226,8 +228,67 @@ function updateRegisterStats() {
     return createdDay.getTime() === today.getTime();
   }).length;
   
-  document.getElementById('todayTasksCount').textContent = todayTasks;
+  document.getElementById('currentTasksCount').textContent = currentTasks;
   document.getElementById('todayNewTasksCount').textContent = todayNewTasks;
+  
+  // 最も期限が迫っている用語を表示
+  updateUrgentDeadline();
+}
+
+// 最も期限が迫っている用語の情報を表示
+function updateUrgentDeadline() {
+  const now = new Date();
+  const urgentCard = document.getElementById('urgentDeadlineText').parentElement;
+  
+  // 復習可能な用語のみを対象とする
+  const reviewableTerms = terms.filter(term => isReadyForReview(term));
+  
+  if (reviewableTerms.length === 0) {
+    urgentCard.style.display = 'none';
+    return;
+  }
+  
+  // 各用語のレベルダウン期限を計算（レベル1-6のみ）
+  let mostUrgentTerm = null;
+  let shortestTime = Infinity;
+  
+  reviewableTerms.forEach(term => {
+    // レベル0は期限なし、レベル7は完璧なので除外
+    if (term.level === 0 || term.level >= 7 || !term.lastReviewDate) return;
+    
+    const config = LEVEL_CONFIG[term.level];
+    if (!config || !config.maxHours) return;
+    
+    const lastReview = new Date(term.lastReviewDate);
+    const deadlineDate = new Date(lastReview.getTime() + (config.maxHours * 60 * 60 * 1000));
+    const remainingMs = deadlineDate - now;
+    
+    if (remainingMs > 0 && remainingMs < shortestTime) {
+      shortestTime = remainingMs;
+      mostUrgentTerm = term;
+    }
+  });
+  
+  if (!mostUrgentTerm) {
+    urgentCard.style.display = 'none';
+    return;
+  }
+  
+  // カードを表示
+  urgentCard.style.display = 'block';
+  
+  // 残り時間を時間と分で表示
+  const remainingHours = Math.floor(shortestTime / (1000 * 60 * 60));
+  const remainingMinutes = Math.floor((shortestTime % (1000 * 60 * 60)) / (1000 * 60));
+  
+  let timeText = '';
+  if (remainingHours > 0) {
+    timeText = `あと${remainingHours}時間${remainingMinutes}分で復習期限が過ぎる用語があります`;
+  } else {
+    timeText = `あと${remainingMinutes}分で復習期限が過ぎる用語があります`;
+  }
+  
+  document.getElementById('urgentDeadlineText').textContent = timeText;
 }
 
 function displayTerms() {
@@ -280,6 +341,9 @@ function deleteTerm(index) {
 
 // === 問題を解く機能 ===
 function initQuizSection() {
+  // まずレベルリセットをチェック
+  checkAndResetExpiredTerms();
+  
   const noTermsMessage = document.getElementById('noTermsMessage');
   const quizContent = document.getElementById('quizContent');
   

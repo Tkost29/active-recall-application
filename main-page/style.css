@@ -185,6 +185,25 @@ textarea:focus {
   font-weight: 500;
 }
 
+.register-stat-card.urgent {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+  border: 2px solid #ff6b6b;
+  padding: 15px 20px;
+}
+
+.register-stat-icon {
+  font-size: 1.5em;
+  margin-bottom: 5px;
+}
+
+.register-stat-text {
+  font-size: 1em;
+  color: #c92a2a;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 .terms-list {
   margin-top: 30px;
 }
