@@ -924,6 +924,84 @@ function searchTerms() {
   });
 }
 
+// === 画像からのOCR機能 ===
+let selectedImage = null;
+
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  selectedImage = file;
+  const reader = new FileReader();
+  
+  reader.onload = function(e) {
+    const preview = document.getElementById('imagePreview');
+    const container = document.getElementById('imagePreviewContainer');
+    preview.src = e.target.result;
+    container.style.display = 'block';
+  };
+  
+  reader.readAsDataURL(file);
+}
+
+async function performOCR() {
+  if (!selectedImage) {
+    alert('画像を選択してください');
+    return;
+  }
+  
+  const ocrButton = document.getElementById('ocrButton');
+  const ocrProgress = document.getElementById('ocrProgress');
+  const textarea = document.getElementById('termDescription');
+  
+  // ボタンを無効化し、進捗表示
+  ocrButton.disabled = true;
+  ocrProgress.style.display = 'block';
+  ocrProgress.textContent = '認識中... (0%)';
+  
+  try {
+    const result = await Tesseract.recognize(
+      selectedImage,
+      'jpn+eng', // 日本語と英語を認識
+      {
+        logger: info => {
+          if (info.status === 'recognizing text') {
+            const progress = Math.round(info.progress * 100);
+            ocrProgress.textContent = `認識中... (${progress}%)`;
+          }
+        }
+      }
+    );
+    
+    // 認識結果をテキストエリアに追加
+    const recognizedText = result.data.text.trim();
+    if (recognizedText) {
+      if (textarea.value) {
+        textarea.value += '\n' + recognizedText;
+      } else {
+        textarea.value = recognizedText;
+      }
+      ocrProgress.textContent = '✅ 認識完了！';
+      setTimeout(() => {
+        ocrProgress.style.display = 'none';
+      }, 2000);
+    } else {
+      ocrProgress.textContent = '⚠️ 文字を認識できませんでした';
+      setTimeout(() => {
+        ocrProgress.style.display = 'none';
+      }, 2000);
+    }
+  } catch (error) {
+    console.error('OCRエラー:', error);
+    ocrProgress.textContent = '❌ エラーが発生しました';
+    setTimeout(() => {
+      ocrProgress.style.display = 'none';
+    }, 2000);
+  } finally {
+    ocrButton.disabled = false;
+  }
+}
+
 // === 初期化 ===
 document.addEventListener('DOMContentLoaded', () => {
   loadData();
