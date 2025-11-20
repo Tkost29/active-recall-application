@@ -871,6 +871,17 @@ textarea:focus {
   margin-bottom: 15px;
 }
 
+.image-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.image-actions .btn {
+  margin: 0;
+}
+
 #ocrProgress {
   margin-top: 10px;
   padding: 10px;
@@ -879,10 +890,6 @@ textarea:focus {
   border-radius: 8px;
   color: #856404;
   font-weight: bold;
-}
-
-#ocrButton {
-  margin-top: 10px;
 }
 
 #ocrButton:disabled {

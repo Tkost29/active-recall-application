@@ -1002,6 +1002,28 @@ async function performOCR() {
   }
 }
 
+function cancelImage() {
+  // 選択された画像をクリア
+  selectedImage = null;
+  
+  // ファイル入力をリセット
+  const imageInput = document.getElementById('imageInput');
+  imageInput.value = '';
+  
+  // プレビューコンテナを非表示
+  const container = document.getElementById('imagePreviewContainer');
+  container.style.display = 'none';
+  
+  // プレビュー画像をクリア
+  const preview = document.getElementById('imagePreview');
+  preview.src = '';
+  
+  // 進捗表示をリセット
+  const ocrProgress = document.getElementById('ocrProgress');
+  ocrProgress.style.display = 'none';
+  ocrProgress.textContent = '認識中...';
+}
+
 // === 初期化 ===
 document.addEventListener('DOMContentLoaded', () => {
   loadData();

@@ -45,7 +45,10 @@
             <button onclick="document.getElementById('imageInput').click()" class="btn btn-secondary">画像を選択</button>
             <div id="imagePreviewContainer" style="display: none;">
               <img id="imagePreview" alt="プレビュー">
-              <button onclick="performOCR()" class="btn btn-primary" id="ocrButton">文字を認識</button>
+              <div class="image-actions">
+                <button onclick="performOCR()" class="btn btn-primary" id="ocrButton">文字を認識</button>
+                <button onclick="cancelImage()" class="btn btn-danger">画像を取り消す</button>
+              </div>
               <div id="ocrProgress" style="display: none;">認識中...</div>
             </div>
           </div>
