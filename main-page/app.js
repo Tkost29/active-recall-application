@@ -7,13 +7,13 @@ let learningHistory = [];
 
 // レベルシステムの定義
 const LEVEL_CONFIG = {
-  1: { name: 'Lv1 初回', minHours: 0, maxHours: 0, color: '#ff6b6b' },
-  2: { name: 'Lv2 短期', minHours: 2, maxHours: 5, color: '#ff8c42' },
-  3: { name: 'Lv3 1日', minHours: 24, maxHours: 48, color: '#ffd93d' },
-  4: { name: 'Lv4 3日', minHours: 72, maxHours: 96, color: '#6bcf7f' },
-  5: { name: 'Lv5 1週', minHours: 168, maxHours: 192, color: '#4d96ff' },
-  6: { name: 'Lv6 2週', minHours: 336, maxHours: 360, color: '#9d4edd' },
-  7: { name: 'Lv7 完璧', minHours: 744, maxHours: 768, color: '#ff006e' }
+  1: { name: 'Lv1 ', minHours: 0, maxHours: 0, color: '#ff6b6b' },
+  2: { name: 'Lv2 ', minHours: 2, maxHours: 5, color: '#ff8c42' },
+  3: { name: 'Lv3 ', minHours: 24, maxHours: 48, color: '#ffd93d' },
+  4: { name: 'Lv4 ', minHours: 72, maxHours: 96, color: '#6bcf7f' },
+  5: { name: 'Lv5 ', minHours: 168, maxHours: 192, color: '#4d96ff' },
+  6: { name: 'Lv6 ', minHours: 336, maxHours: 360, color: '#9d4edd' },
+  7: { name: 'Lv7 ', minHours: 744, maxHours: 768, color: '#ff006e' }
 };
 
 // ローカルストレージからデータを読み込む
@@ -59,7 +59,7 @@ function checkAndResetExpiredTerms() {
   
   if (resetCount > 0) {
     saveData();
-    console.log(`📉 ${resetCount}件の用語レベルをリセットしました`);
+    console.log(` ${resetCount}件の用語レベルをリセットしました`);
   }
 }
 
