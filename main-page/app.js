@@ -548,7 +548,7 @@ async function submitAnswer() {
           
           if (newLevel === 7) {
             levelUpMessage = `<div class="level-up-animation level-max">
-              🏆 完璧にマスターしました！Lv7達成！
+               完璧にマスターしました！Lv7達成！
             </div>`;
           }
         }
@@ -557,7 +557,7 @@ async function submitAnswer() {
         terms[currentTermIndex].level = 0;
         terms[currentTermIndex].nextReviewDate = null;
         levelUpMessage = `<div class="level-reset-animation">
-          ❌ レベルがリセットされました... ${oldLevel} → 0
+           レベルがリセットされました... ${oldLevel} → 0
         </div>`;
         levelChangeText = `${oldLevel} → 0 (リセット)`;
       }
